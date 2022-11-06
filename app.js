@@ -3,6 +3,8 @@ const bodyParser = require('body-parser')
 const request = require('request');
 const path = require('path');
 
+require('dotenv').config()
+
 const app = express();
 
 let PORT = 4000;
@@ -20,6 +22,21 @@ app.post('/signup', (req, res) => {
         res.redirect('/failure.html');
         return;
     }
+})
+
+const data = 
+
+const options = {
+    url: API_URL
+    method: 'POST',
+    headers: {
+        Authorization: API_Key
+    },
+    body: postData
+}
+
+request(options, (err, response, body) => {
+
 })
 
 app.listen(PORT, () => {
