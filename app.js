@@ -7,6 +7,9 @@ require('dotenv').config()
 
 const app = express();
 
+const API_URL = process.env.API_URL
+const API_Key = process.env.API_Key
+
 let PORT = 4000;
 
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -27,12 +30,12 @@ app.post('/signup', (req, res) => {
 const data = 
 
 const options = {
-    url: API_URL
+    url: API_URL,
     method: 'POST',
     headers: {
         Authorization: API_Key
     },
-    body: postData
+    body: postData,
 }
 
 request(options, (err, response, body) => {
