@@ -1,45 +1,63 @@
+require('dotenv').config();
+
 const express = require('express');
 const bodyParser = require('body-parser')
 const request = require('request');
 const path = require('path');
 
-require('dotenv').config()
-
 const app = express();
-
-const API_URL = process.env.API_URL
-const API_Key = process.env.API_Key
 
 let PORT = 4000;
 
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get("/", (req, res) => {
-    res.render("Homepage")
+app.get('/', function(req, res){
+  res.sendFile(__dirname + '/signup.html');
 })
 
-app.post('/signup', (req, res) => {
-    const {firstName, lastName, email } = req.body;
-    if(!firstName || !lastName || !email) {
-        res.redirect('/failure.html');
-        return;
+app.post('/', (req, res) => {
+    const { firstName, lastName, email } = req.body;
+    if (!firstName || !lastName || !email) {
+      res.redirect('/failure.html');
+      return;
     }
 })
 
-const data = 
+const data = {
+    members: [
+      {
+        email_address: email,
+        status: 'subscribed',
+        merge_fields: {
+          FNAME: firstName,
+          LNAME: lastName,
+        }
+      }
+    ]
+  };
+
+const jsonData = JSON.stringify(data);
 
 const options = {
-    url: API_URL,
-    method: 'POST',
-    headers: {
-        Authorization: API_Key
-    },
-    body: postData,
+  url: 'https://us21.api.mailchimp.com/3.0/lists/bf148662cf',
+  method: 'POST',
+  headers: {
+    Authorization: 'auth' + process.env.API_Key
+  },
+    body: postData
 }
 
 request(options, (err, response, body) => {
-
+    if(err){
+        res.redirect('/failure.html');
+    } else {
+        if(response.statusCode === 200){
+            res.redirect('/success.html');
+        } else {
+            res.redirect('/failure.html');
+        }
+    }
 })
 
 app.listen(PORT, () => {
