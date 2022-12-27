@@ -1,65 +1,52 @@
-require('dotenv').config();
-
 const express = require('express');
-const bodyParser = require('body-parser')
-const request = require('request');
+const bodyParser = require('body-parser');
 const path = require('path');
+const dotenv = require('dotenv');
 
 const app = express();
 
-let PORT = 4000;
+dotenv.config();
 
 app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', function(req, res){
-  res.sendFile(__dirname + '/signup.html');
-})
+const PORT = process.env.PORT || 3002;
 
-app.post('/', (req, res) => {
-    const { firstName, lastName, email } = req.body;
-    if (!firstName || !lastName || !email) {
-      res.redirect('/failure.html');
-      return;
-    }
-})
+app.post('/signup', (req, res) => {
+  const { firstName, lastName, email } = req.body;
 
-const data = {
+  if (!firstName || !lastName || !email) {
+    res.redirect('/failure.html');
+    return;
+  }
+
+  const data = {
     members: [
       {
         email_address: email,
         status: 'subscribed',
         merge_fields: {
           FNAME: firstName,
-          LNAME: lastName,
+          LNAME: lastName
         }
       }
     ]
   };
 
-const jsonData = JSON.stringify(data);
+  const postData = JSON.stringify(data);
 
-const options = {
-  url: 'https://us21.api.mailchimp.com/3.0/lists/bf148662cf',
-  method: 'POST',
-  headers: {
-    Authorization: 'auth' + process.env.API_Key
-  },
+  fetch(`https://us21.api.mailchimp.com/3.0/lists/bf148662cf`, {
+    method: 'POST',
+    headers: {
+      Authorization: `auth ${process.env.API_Key}`
+    },
     body: postData
-}
-
-request(options, (err, response, body) => {
-    if(err){
-        res.redirect('/failure.html');
-    } else {
-        if(response.statusCode === 200){
-            res.redirect('/success.html');
-        } else {
-            res.redirect('/failure.html');
-        }
-    }
+  })
+    .then(res.statusCode === 200 ?
+      res.redirect('/success.html') :
+      res.redirect('/failure.html'))
+    .catch(err => console.log(err))
 })
 
-app.listen(PORT, () => {
-    console.log(`Listening on PORT ${PORT}`)
-})
+app.listen(PORT, console.log(`Server started on ${PORT}`));
