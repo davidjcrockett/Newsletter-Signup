@@ -25,7 +25,7 @@ app.post("/signup", (req, res) => {
   }
 
   const jsonData= JSON.stringify(data);
-
+  
   const subscribeURL = `https://us21.api.mailchimp.com/3.0/lists/bf148662cf`;
 
   const options = {
