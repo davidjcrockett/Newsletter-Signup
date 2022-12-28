@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans&display=swap');
+        body {
+            font-family: 'Josefin Sans', sans-serif;
+        }
+    </style>
+    <title>Newsletter Signup</title>
+</head>
+<body>
+<h1>Sign up for weekly updates on Survivor, Big Brother, Ru Paul's Drag Race, and all your favorite reality television shows!</h1>
+<form action="/signup" method="POST">
+     <input 
+     type="text" 
+     name="firstName" 
+     id="first-name" 
+     placeholder="First Name" 
+     required>
+     
+     <input 
+     type="text" 
+     name="lastName" 
+     id="last-name" 
+     placeholder="Last Name" 
+     required>
+     
+     <input 
+     type="email" 
+     name="email" 
+     id="email"
+     placeholder="E-Mail 📧" 
+     required>
+
+     <button
+     type="submit">
+     Sign Up
+     </button>
+
+    </form>
+
+</body>
+
+</html>

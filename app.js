@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const request = require("request");
 const dotenv = require('dotenv');
 
 const app = express();
@@ -13,40 +14,57 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const PORT = process.env.PORT || 3002;
 
-app.post('/signup', (req, res) => {
-  const { firstName, lastName, email } = req.body;
-
-  if (!firstName || !lastName || !email) {
-    res.redirect('/failure.html');
-    return;
-  }
+app.post("/signup", (req, res) => {
+  let email = req.body.email;
 
   const data = {
-    members: [
-      {
-        email_address: email,
-        status: 'subscribed',
-        merge_fields: {
-          FNAME: firstName,
-          LNAME: lastName
-        }
-      }
-    ]
-  };
+    members:[{
+      email_address: email,
+      status: "subscribed",
+    }]
+  }
 
-  const postData = JSON.stringify(data);
+  const jsonData= JSON.stringify(data);
 
-  fetch(`https://us21.api.mailchimp.com/3.0/lists/bf148662cf`, {
-    method: 'POST',
+  const subscribeURL = `https://us21.api.mailchimp.com/3.0/lists/bf148662cf`;
+
+  const options = {
+    url: subscribeURL,
+    method:'POST',
     headers: {
       Authorization: `auth ${process.env.API_Key}`
     },
-    body: postData
-  })
-    .then(res.statusCode === 200 ?
-      res.redirect('/success.html') :
-      res.redirect('/failure.html'))
-    .catch(err => console.log(err))
+    body: jsonData
+  }
+
+    request(options, (err, response, body) => {
+        if (err) {
+           return res.redirect('/failure.html')
+        }
+
+        if(response.statusCode === 200){
+            console.log("true")
+            res.redirect("/success.html");
+        } else{
+            console.log("false")
+            res.redirect("/failure.html");
+        }
+        console.log(jsonData)
+
+    });
+
+});
+
+app.get('/success', (req, res) => {
+  res.sendFile(__dirname + "/success.html")
+})
+
+app.get('/failure', (req, res) => {
+  res.sendFile(__dirname + "/failure.html")
+})
+
+app.post("/failure",function(req,res){
+   res.redirect("/");
 })
 
 app.listen(PORT, console.log(`Server started on ${PORT}`));
